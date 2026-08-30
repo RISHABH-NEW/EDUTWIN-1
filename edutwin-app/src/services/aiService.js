@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/mentor";
+const API_URL = "/api/mentor";
 
 const aiService = {
   async chat(message, history = [], student = {}) {
