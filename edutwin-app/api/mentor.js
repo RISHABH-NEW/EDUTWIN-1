@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // OpenRouter API key
+    // Get OpenRouter API key
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
@@ -31,52 +31,186 @@ export default async function handler(req, res) {
       });
     }
 
-    // Student information
-    const studentName =
-      student?.name || "Student";
+    // =====================================================
+    // STUDENT PROFILE
+    // =====================================================
 
-    const language =
-      student?.language || "English";
+    const studentProfile = {
+      name: student?.name || "Student",
 
-    const weakAreas =
-      Array.isArray(student?.weakAreas)
-        ? student.weakAreas.join(", ")
-        : "Not provided";
+      age: student?.age ?? "Not provided",
 
-    const strongAreas =
-      Array.isArray(student?.strongAreas)
-        ? student.strongAreas.join(", ")
-        : "Not provided";
+      course:
+        student?.course || "Not provided",
 
-    // System prompt
+      class:
+        student?.class || "Not provided",
+
+      email:
+        student?.email || "Not provided",
+
+      preferredLanguage:
+        student?.preferredLanguage ||
+        student?.language ||
+        "English",
+
+      difficulty:
+        student?.difficulty ||
+        "Adaptive",
+
+      learningGoals:
+        student?.learningGoals ||
+        "Not provided",
+
+      overallScore:
+        student?.overallScore ??
+        student?.overallPerformance ??
+        "Not provided",
+
+      attendance:
+        student?.attendance ??
+        "Not provided",
+
+      topicMastery:
+        student?.topicMastery ||
+        "Not provided",
+
+      learningHours:
+        student?.learningHours ||
+        "Not provided",
+
+      weakAreas:
+        student?.weakAreas ||
+        "Not provided",
+
+      strongAreas:
+        student?.strongAreas ||
+        "Not provided",
+    };
+
+    const studentContext = JSON.stringify(
+      studentProfile,
+      null,
+      2
+    );
+
+    // =====================================================
+    // PERSONALIZED AI SYSTEM PROMPT
+    // =====================================================
+
     const systemPrompt = `
 You are EduTwin AI Tutor.
 
-You are a friendly, intelligent and personalized AI tutor for college students.
+You are a friendly, intelligent and personalized AI tutor
+for college students.
 
-Student Information:
-Name: ${studentName}
-Preferred Language: ${language}
-Weak Areas: ${weakAreas}
-Strong Areas: ${strongAreas}
+Your main purpose is to help the student learn concepts,
+improve weak areas, practice questions and achieve their
+learning goals.
 
-Rules:
+IMPORTANT:
+Do NOT treat every student the same.
 
-1. Explain concepts in simple language.
-2. Give examples whenever useful.
-3. For programming questions, explain step by step.
-4. If the student asks for Hindi, respond in Hindi.
-5. If the student asks for Hinglish, respond in Hinglish.
-6. If the student asks for a quiz, ask one question at a time.
-7. Adapt explanations according to the student's weak areas.
-8. If the student makes a mistake, explain it clearly.
-9. Help the student understand instead of simply giving answers.
-10. Keep responses suitable for a college student.
-11. Be concise but useful.
-12. Do not unnecessarily use complicated terminology.
+You must personalize your teaching based on the student's
+available profile information.
+
+STUDENT PROFILE:
+
+${studentContext}
+
+
+PERSONALIZATION RULES:
+
+1. Use the student's preferred language whenever appropriate.
+
+2. If the preferred language is Hinglish, explain concepts
+   in simple Hinglish.
+
+3. If the preferred language is Hindi, explain concepts
+   in simple Hindi.
+
+4. If the preferred language is English, explain concepts
+   in simple English.
+
+5. Respect the student's difficulty level.
+
+6. If difficulty is Beginner:
+   - Explain concepts from basics.
+   - Use simple examples.
+   - Avoid unnecessary technical terminology.
+
+7. If difficulty is Intermediate:
+   - Give moderate-depth explanations.
+   - Include examples and practice questions.
+
+8. If difficulty is Advanced:
+   - Give deeper explanations.
+   - Include edge cases and challenging examples.
+
+9. If the student's profile contains weak areas,
+   give extra attention to those topics.
+
+10. If the student asks about a weak topic:
+    - Explain it slowly.
+    - Break it into smaller concepts.
+    - Give an easy example.
+    - Then give a small practice question.
+
+11. If the student is already strong in a topic,
+    avoid unnecessarily basic explanations.
+
+12. Consider the student's learning goals when
+    recommending what to study next.
+
+13. For programming questions:
+    - Explain the logic first.
+    - Then explain the code.
+    - Use step-by-step reasoning.
+    - Mention common mistakes.
+
+14. If the student asks for a quiz:
+    - Ask one question at a time.
+    - Wait for the student's answer.
+    - Then evaluate it.
+    - Explain the mistake if the answer is wrong.
+
+15. If the student asks for a study plan:
+    - Consider their weak areas.
+    - Consider their learning goals.
+    - Suggest realistic study sessions.
+
+16. If the student asks "What should I study next?",
+    recommend topics based on the available profile
+    and mastery information.
+
+17. Never invent student information.
+
+18. If information is not available in the profile,
+    say that it is not available instead of making it up.
+
+19. Be encouraging and supportive.
+
+20. Do not judge the student's performance.
+
+21. Keep responses concise but useful.
+
+22. Use headings, bullet points and examples when
+    they improve readability.
+
+23. If the user asks a simple question, don't give
+    an unnecessarily long answer.
+
+24. Always focus on helping the student understand
+    rather than simply giving an answer.
+
+The goal is to make EduTwin feel like a personal tutor
+that understands the student's individual learning needs.
 `;
 
-    // Convert chat history
+    // =====================================================
+    // CHAT HISTORY
+    // =====================================================
+
     const previousMessages = Array.isArray(history)
       ? history
           .filter(
@@ -90,11 +224,15 @@ Rules:
             role: msg.isUser
               ? "user"
               : "assistant",
+
             content: msg.text,
           }))
       : [];
 
-    // Messages for OpenRouter
+    // =====================================================
+    // OPENROUTER MESSAGES
+    // =====================================================
+
     const messages = [
       {
         role: "system",
@@ -109,7 +247,10 @@ Rules:
       },
     ];
 
-    // Call OpenRouter
+    // =====================================================
+    // CALL OPENROUTER
+    // =====================================================
+
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -130,16 +271,26 @@ Rules:
 
         body: JSON.stringify({
           model: "openrouter/free",
+
           messages,
+
           temperature: 0.7,
+
           max_tokens: 1200,
         }),
       }
     );
 
+    // =====================================================
+    // READ OPENROUTER RESPONSE
+    // =====================================================
+
     const data = await response.json();
 
-    // OpenRouter error
+    // =====================================================
+    // HANDLE OPENROUTER ERROR
+    // =====================================================
+
     if (!response.ok) {
       console.error(
         "OpenRouter Error:",
@@ -153,7 +304,10 @@ Rules:
       });
     }
 
-    // Extract response
+    // =====================================================
+    // GET AI RESPONSE
+    // =====================================================
+
     const aiResponse =
       data?.choices?.[0]?.message?.content;
 
@@ -163,7 +317,10 @@ Rules:
       });
     }
 
-    // Success
+    // =====================================================
+    // SUCCESS
+    // =====================================================
+
     return res.status(200).json({
       response: aiResponse,
     });
