@@ -9,7 +9,8 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-import aiService from '../services/aiService';
+import aiService from "../services/aiService";
+import { studentProfile } from "../data/mockData";
 
 const quickActions = [
   { label: 'Explain Simply', icon: Lightbulb, mode: 'simple' },
@@ -109,12 +110,7 @@ export default function AITutor() {
 
   const messagesEndRef = useRef(null);
 
-  const student = {
-    name: 'Student',
-    language: 'English',
-    weakAreas: [],
-    strongAreas: [],
-  };
+  const student =studentProfile;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
