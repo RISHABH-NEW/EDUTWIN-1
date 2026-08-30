@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, User, BookOpen, FileText, TrendingUp,
   Bot, Calendar, Compass, Trophy, Settings, ChevronLeft,
-  GraduationCap, Sparkles, X,
+  GraduationCap, Sparkles, X, LogOut,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -24,6 +25,8 @@ export default function Sidebar({ isOpen, onClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { profile } = useApp();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -117,11 +120,20 @@ export default function Sidebar({ isOpen, onClose }) {
               </span>
             </div>
             {!collapsed && (
-              <div className="animate-fade-in min-w-0">
+              <div className="animate-fade-in min-w-0 flex-1">
                 <p className="text-sm font-semibold text-surface-800 truncate">{profile.name}</p>
                 <p className="text-xs text-surface-400 truncate">{profile.course}</p>
               </div>
             )}
+            <button
+              onClick={() => { logout(); navigate('/login'); }}
+              className={`p-2 rounded-xl text-surface-400 hover:bg-red-50 hover:text-red-500
+                transition-all duration-200 flex-shrink-0 group ${collapsed ? 'mt-2' : ''}`}
+              title="Sign out"
+              id="logout-btn"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </aside>

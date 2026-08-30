@@ -66,13 +66,13 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/login')}
               className="btn-ghost text-sm"
             >
               Login
             </button>
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/login')}
               className="btn-primary text-sm"
             >
               Start Learning
@@ -105,7 +105,7 @@ export default function LandingPage() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up"
             style={{ animationDelay: '0.2s' }}>
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/login')}
               className="btn-primary text-base px-8 py-3 rounded-2xl flex items-center gap-2 shadow-lg
                 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
@@ -203,7 +203,7 @@ export default function LandingPage() {
             Join thousands of students who are learning smarter with their AI-powered digital twin.
           </p>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/login')}
             className="mt-8 px-8 py-3 bg-white text-primary-700 rounded-2xl font-semibold text-base
               hover:bg-primary-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]
               inline-flex items-center gap-2"
